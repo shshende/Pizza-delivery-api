@@ -63,3 +63,38 @@ class OrderStatusModel(BaseModel):
                 "order_status":"PENDING"
             }
         }
+
+
+class RestaurantModel(BaseModel):
+    id: Optional[int]
+    name: str
+    location: str
+    description: Optional[str]
+
+    class Config:
+        orm_mode = True
+        schema_extra = {
+            "example": {
+                "name": "Pizza Palace",
+                "location": "1234 Elm Street",
+                "description": "Best pizzas in town."
+            }
+        }
+
+class MenuModel(BaseModel):
+    id: Optional[int]
+    name: str
+    price: int
+    description: Optional[str]
+    restaurant_id: int
+
+    class Config:
+        orm_mode = True
+        schema_extra = {
+            "example": {
+                "name": "Margherita Pizza",
+                "price": 15,
+                "description": "Classic Margherita pizza with fresh tomatoes, mozzarella, and basil.",
+                "restaurant_id": 1
+            }
+        }
