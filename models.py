@@ -46,3 +46,27 @@ class Order(Base):
 
     def __repr__(self):
         return f"<Order {self.id}>"
+    
+
+class Restaurant(Base):
+    __tablename__ = 'restaurants'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), unique=True, nullable=False)
+    location = Column(String(200), nullable=False)
+    description = Column(Text, nullable=True)
+    menus = relationship('Menu', back_populates='restaurant')
+
+    def __repr__(self):
+        return f"<Restaurant {self.name}>"
+
+class Menu(Base):
+    __tablename__ = 'menus'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    price = Column(Integer, nullable=False)
+    description = Column(Text, nullable=True)
+    restaurant_id = Column(Integer, ForeignKey('restaurants.id'))
+    restaurant = relationship('Restaurant', back_populates='menus')
+
+    def __repr__(self):
+        return f"<Menu {self.name} - {self.price}>"
