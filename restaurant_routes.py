@@ -54,3 +54,15 @@ async def add_menu(menu: MenuModel, db: Session = Depends(get_db)):
 async def list_menus(restaurant_id: int, db: Session = Depends(get_db)):
     menus = db.query(Menu).filter(Menu.restaurant_id == restaurant_id).all()
     return jsonable_encoder(menus)
+
+
+@restaurant_router.get('/search/', status_code=status.HTTP_200_OK)
+async def search_restaurants(name: Optional[str] = None, location: Optional[str] = None, db: Session = Depends(get_db)):
+    query = db.query(Restaurant)
+    if name:
+        query = query.filter(Restaurant.name.ilike(f"%{name}%"))
+    if location:
+        query = query.filter(Restaurant.location.ilike(f"%{location}%"))
+    results = query.all()
+    return jsonable_encoder(results)
+
