@@ -1,7 +1,4 @@
 ## PIZZA DELIVERY API
-This is a REST API for a Pizza delivery service built for fun and learning with FastAPI, SQLAlchemy and PostgreSQL. The video playlist is 
-[here](https://www.youtube.com/playlist?list=PLEt8Tae2spYnLMAf8RGCNYhovIFZHVsPP)
-
 
 ## ROUTES TO IMPLEMENT
 | METHOD | ROUTE | FUNCTIONALITY |ACCESS|
@@ -17,6 +14,12 @@ This is a REST API for a Pizza delivery service built for fun and learning with 
 | *GET* | ```/orders/orders/{order_id}/``` | _Retrieve an order_|_Superuser_|
 | *GET* | ```/orders/user/order/{order_id}/``` | _Get user's specific order_|
 | *GET* | ```/docs/``` | _View API documentation_|_All users_|
+POST	/restaurants/create	Create a new restaurant	All users
+GET	/restaurants/list	List all restaurants	All users
+GET	/restaurants/{restaurant_id}	Retrieve a specific restaurant by ID	All users
+POST	/restaurants/menu	Add a menu to a restaurant	All users
+GET	/restaurants/{restaurant_id}/menus	List all menus for a specific restaurant	All users
+GET	/restaurants/search	Search restaurants with filtering options	All users
 
 ## How to run the Project
 - Install Postgreql
