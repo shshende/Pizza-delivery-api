@@ -4,6 +4,8 @@ from database import get_db
 from models import Restaurant, Menu
 from schemas import RestaurantModel, MenuModel
 from fastapi.encoders import jsonable_encoder
+from typing import Optional
+from sqlalchemy.orm import joinedload
 
 restaurant_router = APIRouter(
     prefix="/restaurants",
@@ -56,13 +58,53 @@ async def list_menus(restaurant_id: int, db: Session = Depends(get_db)):
     return jsonable_encoder(menus)
 
 
+# @restaurant_router.get('/search/', status_code=status.HTTP_200_OK)
+# async def search_restaurants(name: Optional[str] = None, location: Optional[str] = None, db: Session = Depends(get_db)):
+#     query = db.query(Restaurant)
+#     if name:
+#         query = query.filter(Restaurant.name.ilike(f"%{name}%"))
+#     if location:
+#         query = query.filter(Restaurant.location.ilike(f"%{location}%"))
+#     results = query.all()
+#     return jsonable_encoder(results)
 @restaurant_router.get('/search/', status_code=status.HTTP_200_OK)
-async def search_restaurants(name: Optional[str] = None, location: Optional[str] = None, db: Session = Depends(get_db)):
-    query = db.query(Restaurant)
+async def search_restaurants(
+    name: Optional[str] = None, 
+    location: Optional[str] = None, 
+    description: Optional[str] = None,  # New parameter for restaurant description
+    menu_name: Optional[str] = None,    # New parameter for menu name
+    min_menu_price: Optional[int] = None,  # New parameter for minimum menu price
+    max_menu_price: Optional[int] = None,  # New parameter for maximum menu price
+    db: Session = Depends(get_db)
+):
+    # Base query for restaurants
+    query = db.query(Restaurant).options(joinedload(Restaurant.menus))
+
+    # Apply filters for Restaurant model fields
     if name:
         query = query.filter(Restaurant.name.ilike(f"%{name}%"))
     if location:
         query = query.filter(Restaurant.location.ilike(f"%{location}%"))
-    results = query.all()
-    return jsonable_encoder(results)
+    if description:
+        query = query.filter(Restaurant.description.ilike(f"%{description}%"))
 
+    # Apply filters for related Menu model fields
+    if menu_name or min_menu_price or max_menu_price:
+        # Join with the Menu model to apply menu-related filters
+        query = query.join(Restaurant.menus)
+
+        # Filtering based on menu name
+        if menu_name:
+            query = query.filter(Menu.name.ilike(f"%{menu_name}%"))
+
+        # Filtering based on menu price range
+        if min_menu_price is not None:
+            query = query.filter(Menu.price >= min_menu_price)
+        if max_menu_price is not None:
+            query = query.filter(Menu.price <= max_menu_price)
+
+    # Retrieve all matching results
+    results = query.all()
+
+    # Return JSON-encoded results
+    return jsonable_encoder(results)
